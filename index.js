@@ -33,7 +33,6 @@ async function temperature(){
 		
 			var docRef = collectionRef.doc(d.toString());
 			var setTemp = docRef.set({
-			//var setTemp = collectionRef.add({
 	  			temperature: temperature,
 	  			humidity: humidity,
 				date: d
@@ -41,7 +40,7 @@ async function temperature(){
 			
 		}) 
 
-		await wait(30000)
+		await wait(config.frequency)
 	}
 }
 temperature()
