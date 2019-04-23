@@ -1,0 +1,9 @@
+{   
+	"gcp": {
+		"firestore": {
+			"project": "project-123456",     
+			"keyfile": "file.key",
+			"collection": "my-collection"
+		}
+	}
+}
