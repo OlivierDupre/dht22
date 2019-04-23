@@ -19,7 +19,7 @@ while True:
 
     print 'Temp ',temperature,' humidity ',humidity
 
-    doc_ref = db.collection(config["gcp"]["firestore"]["collection"]).document(timestamp)
+    doc_ref = db.collection(config["gcp"]["firestore"]["collection"]+'python').document(timestamp)
     doc_ref.set({
         u'temperature': temperature,
         u'humidity': humidity,
