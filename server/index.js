@@ -13,40 +13,48 @@ function wait(milleseconds) {
 
 async function temperature() {
     var collectionRef = db.collection(config.gcp.firestore.collection);
-    var firstRecord, lastRecord;
+    let firstRecord, lastRecord;
 
     // while (true) {
-    collectionRef.orderBy('date').limit(1).get().then((last) => {
-        last.forEach((doc) => {
-            lastRecord = doc.data();
-        });
-    }).catch((err) => {
-        console.log('Error getting documents', err);
-    });
+    // collectionRef.orderBy('date').limit(1).get().then((last) => {
+    //     last.forEach((doc) => {
+    //         lastRecord = doc.data();
+    //     });
+    // }).catch((err) => {
+    //     console.log('Error getting documents', err);
+    // });
 
-    collectionRef.orderBy('date', 'desc').limit(1).get().then((first) => {
-        first.forEach((doc) => {
-            firstRecord = doc.data();
-        });
-    }).catch((err) => {
-        console.log('Error getting documents', err);
-    });
+    // collectionRef.orderBy('date', 'desc').limit(1).get().then((first) => {
+    //     first.forEach((doc) => {
+    //         firstRecord = doc.data();
+    //     });
+    // }).catch((err) => {
+    //     console.log('Error getting documents', err);
+    // });
 
     let count = 0;
     let sumTemp = 0;
     let maxTemp = { temperature: -Infinity };
     let minTemp = { temperature: Infinity };
 
+    let threeDaysAgo = new Date(Date.now());
+    threeDaysAgo.setHours(threeDaysAgo.getHours() - 72);
+
     // Query from most recent to older ones
-    collectionRef.orderBy('date', 'desc').stream().on('data', (record) => {
+    collectionRef.where('date', '>', threeDaysAgo).orderBy('date', 'desc').stream().on('data', (record) => {
+        firstRecord = record.data();
+
+        if (lastRecord === undefined) {
+            lastRecord = firstRecord
+        }
+
         // console.log('Found document ', record.id);
-        currentRecord = record.data()
-        currentTemp = parseFloat(currentRecord.temperature)
+        currentTemp = parseFloat(firstRecord.temperature)
         if (currentTemp > parseFloat(maxTemp.temperature)) {
-            maxTemp = currentRecord
+            maxTemp = firstRecord
         }
         if (currentTemp < parseFloat(minTemp.temperature)) {
-            minTemp = currentRecord
+            minTemp = firstRecord
         }
         sumTemp += currentTemp;
         ++count;
@@ -64,8 +72,8 @@ async function temperature() {
             '\nMax temp is ' + parseFloat(maxTemp.temperature) + ' on ' + maxDate +
             '\nMin temp is ' + parseFloat(minTemp.temperature) + ' on ' + minDate);
 
-        console.log("Last record is ", lastRecord);
-        console.log("First record is ", firstRecord);
+        console.log("First record is ", new Date(firstRecord.date._seconds * 1000));
+        console.log("Last record is ", new Date(lastRecord.date._seconds * 1000));
     });
 
     //     Wed May 01 2019 23:59:33 GMT+0100 (British Summer Time) => { humidity: '47.8%',
