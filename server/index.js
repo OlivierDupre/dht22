@@ -14,8 +14,6 @@ function compute(currentRecord, data) {
     return new Promise(resolve => {
         currentTemp = parseFloat(currentRecord.temperature)
 
-        console.log(currentTemp)
-
         if (currentTemp > parseFloat(data.max.temperature)) {
             data.max = currentRecord
         }
@@ -64,7 +62,6 @@ async function temperature() {
         // }
 
         // monthly = await compute(currentRecord, monthly);
-        console.log("GOGOGOGO")
         compute(currentRecord, monthly).then(result => { monthly = result });
         // // console.log('Found document ', record.id);
         // currentTemp = parseFloat(currentRecord.temperature)
@@ -86,7 +83,7 @@ async function temperature() {
         // Create a new JavaScript Date object based on the timestamp multiplied by 1000 so that the argument is in milliseconds, not seconds.
         var minDate = new Date(monthly.min.date._seconds * 1000);
 
-        console.log('Number of temperature recorded ' + count +
+        console.log('Number of temperature recorded ' + monthly.count +
             '\nAverage temp is ' + averageTemp +
             '\nMax temp is ' + parseFloat(monthly.max.temperature) + ' on ' + maxDate +
             '\nMin temp is ' + parseFloat(monthly.min.temperature) + ' on ' + minDate);
