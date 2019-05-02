@@ -1,0 +1,22 @@
+{
+  "name": "dht-server",
+  "version": "1.0.0",
+  "description": "DHT server side, checking temperature periodically and send notifications when something is going wrong.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OlivierDupre/dht22.git"
+  },
+  "author": "Olivier Dupré",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/OlivierDupre/dht22/issues"
+  },
+  "homepage": "https://github.com/OlivierDupre/dht22#readme",
+  "dependencies": {
+    "@google-cloud/firestore": "^1.3.0"
+  }
+}
