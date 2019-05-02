@@ -2,7 +2,7 @@
 ## Emitter
 1. Copy the `pi` folder to the Raspberry PI
 2. ssh to the `pi`
-3. Copy config.template to config.json
+3. Copy local `config.template` to PI named `config.json`
 4. Update values
 5. Run `pip install --upgrade google-cloud-firestore`
 
