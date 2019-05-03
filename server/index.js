@@ -42,7 +42,7 @@ function display(data, timeFrame) {
 /**
  * Data sample: Wed May 01 2019 23:59:33 GMT+0100 (British Summer Time) => { humidity: '47.8%', temperature: '20.1*', date: Timestamp { _seconds: 1556751573, _nanoseconds: 749000000 } }
  */
-async function temperature() {
+async function analyze() {
     let collectionRef = db.collection(config.gcp.firestore.collection);
 
     let now = new Date(Date.now()),
@@ -78,7 +78,7 @@ async function temperature() {
                 weekly = await compute(currentRecord, weekly);
 
                 if (currentDate > daily.date) {
-                    daily = await compute(currentRecord, daily);
+					daily = await compute(currentRecord, daily);
 
                     if (currentDate > halfDay.date) {
                         halfDay = await compute(currentRecord, halfDay);
@@ -109,4 +109,4 @@ async function temperature() {
             display(hourly, "UNE HEURE");
     });
 }
-temperature()
+analyze()
