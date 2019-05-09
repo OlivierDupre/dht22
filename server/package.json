@@ -2,7 +2,7 @@
   "name": "dht-server",
   "version": "1.0.0",
   "description": "DHT server side, checking temperature periodically and send notifications when something is going wrong.",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

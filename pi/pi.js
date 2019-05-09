@@ -13,7 +13,7 @@ function wait(milleseconds) {
 	  return new Promise(resolve => setTimeout(resolve, milleseconds))
 }
 
-async function temperature(){
+async function sendValues(){
 	var collectionRef = db.collection(config.gcp.firestore.collection);
 
 	while(true){
@@ -43,4 +43,4 @@ async function temperature(){
 		await wait(config.frequency)
 	}
 }
-temperature()
+sendValues()
