@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: node-guestbook-frontend
+  name: dht-pi
   labels:
-    app: node-guestbook
-    tier: frontend
+    app: dht-pi
+    tier: data
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: node-guestbook
-      tier: frontend
+      app: dht-pi
+      tier: data
   template:
     metadata:
       labels:
-        app: node-guestbook
-        tier: frontend
+        app: dht-pi
+        tier: data
     spec:
       containers:
-      - name: frontend
-        image: node-guestbook-frontend
+      - name: dht-pi
+        image: gcr.io/dht-temperature-238413/dht-pi
         ports:
         - name: http-server
           containerPort: 8080

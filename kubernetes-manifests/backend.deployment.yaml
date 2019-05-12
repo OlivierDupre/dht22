@@ -18,8 +18,8 @@ spec:
         tier: backend
     spec:
       containers:
-      - name: backend
-        image: dht-backend
+      - name: dht-backend
+        image: gcr.io/dht-temperature-238413/dht-backend
         ports:
         - name: http-server
           containerPort: 8080
