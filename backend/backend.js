@@ -9,12 +9,19 @@ const db = new Firestore({
 function compute(currentRecord, data) {
     return new Promise(resolve => {
         currentTemp = parseFloat(currentRecord.temperature)
+        currentDate = new Date(currentRecord.date._seconds * 1000);
 
         if (currentTemp > parseFloat(data.max.temperature)) {
             data.max = currentRecord
         }
         if (currentTemp < parseFloat(data.min.temperature)) {
             data.min = currentRecord
+        }
+        if (currentDate > parseFloat(data.date.last)) {
+            data.date.last = currentDate
+        }
+        if (currentDate < parseFloat(data.date.first)) {
+            data.date.first = currentDate
         }
         data.sum += currentTemp;
         data.count++;
@@ -28,11 +35,11 @@ function display(data, timeFrame) {
 
     // Create a new JavaScript Date object based on the timestamp multiplied by 1000 so that the argument is in milliseconds, not seconds.
     var maxDate = new Date(data.max.date._seconds * 1000);
-
-    // Create a new JavaScript Date object based on the timestamp multiplied by 1000 so that the argument is in milliseconds, not seconds.
     var minDate = new Date(data.min.date._seconds * 1000);
+    var firstDate = new Date(data.date.first._seconds * 1000);
+    var lastDate = new Date(data.date.last._seconds * 1000);
 
-    console.log('########### ENREGISTREMENTS SUR ' + timeFrame + ' ###########' +
+    console.log('########### ENREGISTREMENTS SUR ' + timeFrame + ' (' + firstDate + ' → ' + lastDate + ') ###########' +
         '\nNombre de températures enregistrées ' + data.count +
         '\nTempérature moyenne ' + averageTemp.toFixed(1) +
         '\nTempérature max ' + parseFloat(data.max.temperature).toFixed(1) + ' le ' + maxDate +
@@ -59,34 +66,34 @@ async function analyze() {
     quarterDayAgo.setHours(now.getHours() - 6);
     oneHourAgo.setHours(now.getHours() - 1);
 
-    let monthly = { date: oneMonthAgo, count: 0, sum: 0, max: { temperature: -Infinity }, min: { temperature: Infinity } },
-        weekly = { date: oneWeekAgo, count: 0, sum: 0, max: { temperature: -Infinity }, min: { temperature: Infinity } },
-        daily = { date: oneDayAgo, count: 0, sum: 0, max: { temperature: -Infinity }, min: { temperature: Infinity } },
-        halfDay = { date: halfDayAgo, count: 0, sum: 0, max: { temperature: -Infinity }, min: { temperature: Infinity } },
-        quarterDay = { date: quarterDayAgo, count: 0, sum: 0, max: { temperature: -Infinity }, min: { temperature: Infinity } },
-        hourly = { date: oneHourAgo, count: 0, sum: 0, max: { temperature: -Infinity }, min: { temperature: Infinity } };
+    let monthly = { date: {threshold: oneMonthAgo, first: new Date(Date.now()), last: new Date(oneMonthAgo)}, count: 0, sum: 0, max: { temperature: -Infinity }, min: { temperature: Infinity } },
+        weekly = { date: {threshold: oneWeekAgo, first: new Date(Date.now()), last: new Date(oneWeekAgo)}, count: 0, sum: 0, max: { temperature: -Infinity }, min: { temperature: Infinity } },
+        daily = { date: {threshold: oneDayAgo, first: new Date(Date.now()), last: new Date(oneDayAgo)}, count: 0, sum: 0, max: { temperature: -Infinity }, min: { temperature: Infinity } },
+        halfDay = { date: {threshold: halfDayAgo, first: new Date(Date.now()), last: new Date(halfDayAgo)}, count: 0, sum: 0, max: { temperature: -Infinity }, min: { temperature: Infinity } },
+        quarterDay = { date: {threshold: quarterDayAgo, first: new Date(Date.now()), last: new Date(quarterDayAgo)}, count: 0, sum: 0, max: { temperature: -Infinity }, min: { temperature: Infinity } },
+        hourly = { date: {threshold: oneHourAgo, first: new Date(Date.now()), last: new Date(oneHourAgo)}, count: 0, sum: 0, max: { temperature: -Infinity }, min: { temperature: Infinity } };
 
     // Query from most recent to older ones
     collectionRef.where('date', '>', oneMonthAgo).orderBy('date', 'desc').stream().on('data', async(record) => {
         currentRecord = record.data();
 
         var currentDate = new Date(currentRecord.date._seconds * 1000);
-        if (currentDate > monthly.date) {
+        if (currentDate > monthly.date.threshold) {
             monthly = await compute(currentRecord, monthly);
 
-            if (currentDate > weekly.date) {
+            if (currentDate > weekly.date.threshold) {
                 weekly = await compute(currentRecord, weekly);
 
-                if (currentDate > daily.date) {
+                if (currentDate > daily.date.threshold) {
 					daily = await compute(currentRecord, daily);
 
-                    if (currentDate > halfDay.date) {
+                    if (currentDate > halfDay.date.threshold) {
                         halfDay = await compute(currentRecord, halfDay);
 
-                        if (currentDate > quarterDay.date) {
+                        if (currentDate > quarterDay.date.threshold) {
                             quarterDay = await compute(currentRecord, quarterDay);
 
-                            if (currentDate > hourly.date) {
+                            if (currentDate > hourly.date.threshold) {
                                 monthly = await compute(currentRecord, hourly);
                             }
                         }
