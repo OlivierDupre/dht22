@@ -1,11 +1,12 @@
 # Use base node 8 image from Docker hub, because distroless is based on Node 8 LTS
 FROM node:8
+ENV NODE_ENV production
 
 WORKDIR /backend
 
 # Copy package.json and install dependencies
-COPY ../package.json ./
-RUN npm install
+COPY ["../package.json", "../package-lock.json*", "Dockerfile", "LICENSE", "README.md", "./"]
+RUN npm install --production --silent
 
 # Copy rest of the application source code
 COPY . .
@@ -17,6 +18,8 @@ COPY . .
 # ENTRYPOINT ["node", "app.js"]
 
 FROM gcr.io/distroless/nodejs
+ENV NODE_ENV production
 COPY --from=build-env /backend /backend
+# EXPOSE 3000
 WORKDIR /backend
 CMD ["backend.js"]
