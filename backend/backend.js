@@ -1,4 +1,5 @@
 const config = require('./config')
+const { DateTime } = require("luxon");
 const Firestore = require('@google-cloud/firestore');
 
 const db = new Firestore({
@@ -34,16 +35,20 @@ function compute(currentRecord, data) {
 
 function display(data, timeFrame) {
     let averageTemp = data.sum / data.count;
+    let localDateFormat = { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' }
 
-    // Create a new JavaScript Date object based on the timestamp multiplied by 1000 so that the argument is in milliseconds, not seconds.
-    var maxDate = new Date(data.max.date._seconds * 1000);
-    var minDate = new Date(data.min.date._seconds * 1000);
+    var maxDate = DateTime.fromMillis(data.max.date._seconds);
+    var minDate = DateTime.fromMillis(data.min.date._seconds);
+    var firstDate = DateTime.fromJSDate(data.date.first);
+    var lastDate = DateTime.fromJSDate(data.date.last);
 
-    console.log('########### ENREGISTREMENTS SUR ' + timeFrame + ' (' + data.date.first + ' → ' + data.date.last + ') ###########' +
+    console.log('########### ENREGISTREMENTS SUR ' + timeFrame + ' (' + firstDate.setLocale('fr').toLocaleString(localDateFormat) + ' → ' + lastDate.setLocale('fr').toLocaleString(localDateFormat) + ') ###########' +
         '\nNombre de températures enregistrées ' + data.count +
         '\nTempérature moyenne ' + averageTemp.toFixed(1) +
-        '\nTempérature max ' + parseFloat(data.max.temperature).toFixed(1) + ' le ' + maxDate +
-        '\nTempérature minimale ' + parseFloat(data.min.temperature).toFixed(1) + ' le ' + minDate);
+        '\nTempérature max ' + parseFloat(data.max.temperature).toFixed(1) + ' le ' +
+        maxDate.setLocale('fr').toLocaleString(localDateFormat) +
+        '\nTempérature minimale ' + parseFloat(data.min.temperature).toFixed(1) + ' le ' + 
+        minDate.setLocale('fr').toLocaleString(localDateFormat));
 }
 
 /**
@@ -64,24 +69,24 @@ async function getData(maxAge, dataMap) {
                 monthly = await compute(currentRecord, dataMap.get("monthly"))
                 dataMap.set("monthly", monthly)
             }
-            if (typeof dataMap.get("weekly") !== 'undefined' && currentDate > typeof dataMap.get("weekly").date.threshold) {
-                weekly = await compute(currentRecord, typeof dataMap.get("weekly"))
+            if (typeof dataMap.get("weekly") !== 'undefined' && currentDate > dataMap.get("weekly").date.threshold) {
+                weekly = await compute(currentRecord, dataMap.get("weekly"))
                 dataMap.set("weekly", weekly)
             }
-            if (typeof dataMap.get("daily") !== 'undefined' && currentDate > typeof dataMap.get("daily").date.threshold) {
-                daily = await compute(currentRecord, typeof dataMap.get("daily"))
+            if (typeof dataMap.get("daily") !== 'undefined' && currentDate > dataMap.get("daily").date.threshold) {
+                daily = await compute(currentRecord, dataMap.get("daily"))
                 dataMap.set("daily", daily)
             }
-            if (typeof dataMap.get("halfDay") !== 'undefined' && currentDate > typeof dataMap.get("halfDay").date.threshold) {
-                halfDay = await compute(currentRecord, typeof dataMap.get("halfDay"))
+            if (typeof dataMap.get("halfDay") !== 'undefined' && currentDate > dataMap.get("halfDay").date.threshold) {
+                halfDay = await compute(currentRecord, dataMap.get("halfDay"))
                 dataMap.set("halfDay", halfDay)
             }
-            if (typeof dataMap.get("quarterDay") !== 'undefined' && currentDate > typeof dataMap.get("quarterDay").date.threshold) {
-                quarterDay = await compute(currentRecord, typeof dataMap.get("quarterDay"))
+            if (typeof dataMap.get("quarterDay") !== 'undefined' && currentDate > dataMap.get("quarterDay").date.threshold) {
+                quarterDay = await compute(currentRecord, dataMap.get("quarterDay"))
                 dataMap.set("quarterDay", quarterDay)
             }
-            if (typeof dataMap.get("hourly") !== 'undefined' && currentDate > typeof dataMap.get("hourly").date.threshold) {
-                hourly = await compute(currentRecord, typeof dataMap.get("hourly"))
+            if (typeof dataMap.get("hourly") !== 'undefined' && currentDate > dataMap.get("hourly").date.threshold) {
+                hourly = await compute(currentRecord, dataMap.get("hourly"))
                 dataMap.set("hourly", hourly)
             }
         }).on('end', () => {
@@ -92,7 +97,7 @@ async function getData(maxAge, dataMap) {
 }
 
 function displayData(dataMap) {
-    console.log("Display data", dataMap)
+    // console.log("Display data", dataMap)
 
     if (typeof dataMap.get("monthly") !== 'undefined' && typeof dataMap.get("monthly").max.date !== 'undefined')
         display(dataMap.get("monthly"), "UN MOIS");
@@ -140,7 +145,7 @@ async function analyze() {
     dataMap.set("quarterDay", quarterDay)
     dataMap.set("hourly", hourly)
 
-    dataMap = await getData(quarterDayAgo, dataMap);
+    dataMap = await getData(oneMonthAgo, dataMap);
     displayData(dataMap);
 }
 analyze()
