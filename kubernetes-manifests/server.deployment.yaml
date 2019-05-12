@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dht-backend
+  labels:
+    app: dht-backend
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dht-backend
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: dht-backend
+        tier: backend
+    spec:
+      containers:
+      - name: backend
+        image: dht-backend
+        ports:
+        - name: http-server
+          containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        - name: GUESTBOOK_DB_ADDR
+          value: "dht-backend-mongodb:27017"
