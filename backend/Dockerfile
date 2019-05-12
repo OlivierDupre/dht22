@@ -1,11 +1,11 @@
 # Use base node 8 image from Docker hub, because distroless is based on Node 8 LTS
-FROM node:8
+FROM node:8 as build-env
 ENV NODE_ENV production
 
 WORKDIR /backend
 
 # Copy package.json and install dependencies
-COPY ["../package.json", "../package-lock.json*", "Dockerfile", "LICENSE", "README.md", "./"]
+COPY ["./package.json", "./package-lock.json*", "Dockerfile", "./"]
 RUN npm install --production --silent
 
 # Copy rest of the application source code
