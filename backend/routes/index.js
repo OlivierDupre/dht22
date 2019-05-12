@@ -13,10 +13,6 @@ const HALF_DAY = "halfDay";
 const QUARTER_DAY = "quarterDay";
 const HOURLY = "hourly";
 
-const db = new Firestore({
-    projectId: config.gcp.firestore.project,
-    keyFilename: config.gcp.firestore.keyfile
-});
 const router = express.Router();
 router.use(bodyParser.json());
 
@@ -69,6 +65,11 @@ function format(data, timeFrame) {
  * Data sample: Wed May 01 2019 23:59:33 GMT+0100 (British Summer Time) => { humidity: '47.8%', temperature: '20.1*', date: Timestamp { _seconds: 1556751573, _nanoseconds: 749000000 } }
  */
 async function getData(maxAge, dataMap) {
+    const db = new Firestore({
+        projectId: config.gcp.firestore.project,
+        keyFilename: config.gcp.firestore.keyfile
+    });
+
     return new Promise(resolve => {
         let collectionRef = db.collection(config.gcp.firestore.collection);
         let dataCount = 0;
@@ -177,7 +178,7 @@ router.get('/timeframe/:timeframe', async (req, res) => {
 
     // Query for messages in descending order
     try {
-        if ([MONTHLY, WEEKLY, DAILY, HALF_DAY, QUARTER_DAY, HOURLY].indexOf(req.params.timeframe ) >= 0) {
+        if ([MONTHLY, WEEKLY, DAILY, HALF_DAY, QUARTER_DAY, HOURLY].indexOf(req.params.timeframe) >= 0) {
             dataMap = await analyze(req.params.timeframe)
             stringData = await formatData(dataMap.get(req.params.timeframe).date.threshold, dataMap)
             res.status(200).send(stringData.replace(/\n/g, "<br />"))
