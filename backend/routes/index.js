@@ -74,6 +74,7 @@ async function getData(maxAge, dataMap) {
     // Cloud run uses it's own Service Account with edit rights on the local project (& its services...). No need to specify another SA when instanciating connection with Firestore.
     // https://cloud.google.com/run/docs/securing/authenticating
     // https://cloud.google.com/nodejs/docs/reference/firestore/1.3.x/module-@google-cloud_firestore
+    // Test locally using: https://cloud.google.com/run/docs/testing/local
     const db = new Firestore();
 
     return new Promise(resolve => {
