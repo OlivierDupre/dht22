@@ -65,10 +65,16 @@ function format(data, timeFrame) {
  * Data sample: Wed May 01 2019 23:59:33 GMT+0100 (British Summer Time) => { humidity: '47.8%', temperature: '20.1*', date: Timestamp { _seconds: 1556751573, _nanoseconds: 749000000 } }
  */
 async function getData(maxAge, dataMap) {
-    const db = new Firestore({
-        projectId: config.gcp.firestore.project,
-        keyFilename: config.gcp.firestore.keyfile
-    });
+    // Use this locally, for debug or whatever needs
+    // const db = new Firestore({
+    //     projectId: config.gcp.firestore.project,
+    //     keyFilename: config.gcp.firestore.keyfile
+    // });
+
+    // Cloud run uses it's own Service Account with edit rights on the local project (& its services...). No need to specify another SA when instanciating connection with Firestore.
+    // https://cloud.google.com/run/docs/securing/authenticating
+    // https://cloud.google.com/nodejs/docs/reference/firestore/1.3.x/module-@google-cloud_firestore
+    const db = new Firestore();
 
     return new Promise(resolve => {
         let collectionRef = db.collection(config.gcp.firestore.collection);
