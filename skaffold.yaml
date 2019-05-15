@@ -29,3 +29,4 @@ profiles:
     # - image: gcr.io/own-gcr/dht-pi
     #   context: pi
     local: {}
+    # gcloud beta run deploy dht-backend   --image gcr.io/dht-temperature-238413/dht-backend

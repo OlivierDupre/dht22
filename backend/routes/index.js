@@ -3,7 +3,6 @@ const { DateTime } = require("luxon");
 const Firestore = require('@google-cloud/firestore');
 
 const express = require('express')
-const app = express()
 const bodyParser = require('body-parser');
 
 const MONTHLY = "monthly";
@@ -15,6 +14,18 @@ const HOURLY = "hourly";
 
 const router = express.Router();
 router.use(bodyParser.json());
+
+// Use this locally, for debug or whatever needs
+// const db = new Firestore({
+//     projectId: config.gcp.firestore.project,
+//     keyFilename: config.gcp.firestore.keyfile
+// });
+
+// Cloud run uses it's own Service Account with edit rights on the local project (& its services...). No need to specify another SA when instanciating connection with Firestore.
+// https://cloud.google.com/run/docs/securing/authenticating
+// https://cloud.google.com/nodejs/docs/reference/firestore/1.3.x/module-@google-cloud_firestore
+// Test locally using: https://cloud.google.com/run/docs/testing/local
+const db = new Firestore();
 
 function compute(currentRecord, data) {
     return new Promise(resolve => {
@@ -46,8 +57,8 @@ function format(data, timeFrame) {
     let averageTemp = data.sum / data.count;
     let localDateFormat = { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' }
 
-    var maxDate = DateTime.fromMillis(data.max.date._seconds);
-    var minDate = DateTime.fromMillis(data.min.date._seconds);
+    var maxDate = DateTime.fromSeconds(data.max.date._seconds);
+    var minDate = DateTime.fromSeconds(data.min.date._seconds);
     var firstDate = DateTime.fromJSDate(data.date.first);
     var lastDate = DateTime.fromJSDate(data.date.last);
 
@@ -65,18 +76,6 @@ function format(data, timeFrame) {
  * Data sample: Wed May 01 2019 23:59:33 GMT+0100 (British Summer Time) => { humidity: '47.8%', temperature: '20.1*', date: Timestamp { _seconds: 1556751573, _nanoseconds: 749000000 } }
  */
 async function getData(maxAge, dataMap) {
-    // Use this locally, for debug or whatever needs
-    // const db = new Firestore({
-    //     projectId: config.gcp.firestore.project,
-    //     keyFilename: config.gcp.firestore.keyfile
-    // });
-
-    // Cloud run uses it's own Service Account with edit rights on the local project (& its services...). No need to specify another SA when instanciating connection with Firestore.
-    // https://cloud.google.com/run/docs/securing/authenticating
-    // https://cloud.google.com/nodejs/docs/reference/firestore/1.3.x/module-@google-cloud_firestore
-    // Test locally using: https://cloud.google.com/run/docs/testing/local
-    const db = new Firestore();
-
     return new Promise(resolve => {
         let collectionRef = db.collection(config.gcp.firestore.collection);
         let dataCount = 0;
@@ -141,7 +140,7 @@ function formatData(maxAge, dataMap) {
     })
 }
 
-function analyze(timeFrame) {
+function retrieveData(timeFrame) {
     return new Promise(async resolve => {
         let now = new Date(Date.now()),
             oneMonthAgo = new Date(now),
@@ -186,7 +185,7 @@ router.get('/timeframe/:timeframe', async (req, res) => {
     // Query for messages in descending order
     try {
         if ([MONTHLY, WEEKLY, DAILY, HALF_DAY, QUARTER_DAY, HOURLY].indexOf(req.params.timeframe) >= 0) {
-            dataMap = await analyze(req.params.timeframe)
+            dataMap = await retrieveData(req.params.timeframe)
             stringData = await formatData(dataMap.get(req.params.timeframe).date.threshold, dataMap)
             res.status(200).send(stringData.replace(/\n/g, "<br />"))
         } else {
