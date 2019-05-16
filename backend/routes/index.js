@@ -181,6 +181,7 @@ function retrieveData(timeFrame) {
 // Handles GET requests to /messages
 router.get('/timeframe/:timeframe', async (req, res) => {
     console.log(`Received request: ${req.method} ${req.url}`)
+    console.log("DateTime.DATETIME_MED ", DateTime.DATETIME_MED)
 
     // Query for messages in descending order
     try {

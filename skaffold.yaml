@@ -29,4 +29,14 @@ profiles:
     # - image: gcr.io/own-gcr/dht-pi
     #   context: pi
     local: {}
-    # gcloud beta run deploy dht-backend   --image gcr.io/dht-temperature-238413/dht-backend
+
+
+# gcloud container clusters create dht-cluster  --preemptible --cluster-version 1.12.7-gke.10  --enable-kubernetes-alpha --machine-type n1-standard-1 --disk-size 20 --num-nodes 1 
+# gcloud container clusters create dht-cluster --cluster-version 1.12.7-gke.10  --machine-type n1-standard-1 --disk-size 20 --num-nodes 1 
+# gcloud container clusters get-credentials dht-cluster --zone europe-west1-b --project dht-temperature-238413
+# gcloud container clusters get-credentials dht-cluster-2 --zone europe-north1-a --project dht-temperature-238413
+# gcloud beta container operations list
+# gcloud beta container operations describe XXX
+# gcloud beta container operations cancel XXX
+# gcloud container clusters delete dht-cluster-2
+# gcloud beta run deploy dht-backend   --image gcr.io/dht-temperature-238413/dht-backend
