@@ -31,6 +31,8 @@ profiles:
     local: {}
 
 
+# gcloud auth login
+# gcloud init
 # gcloud container clusters create dht-cluster  --preemptible --cluster-version 1.12.7-gke.10  --enable-kubernetes-alpha --machine-type n1-standard-1 --disk-size 20 --num-nodes 1 
 # gcloud container clusters create dht-cluster --cluster-version 1.12.7-gke.10  --machine-type n1-standard-1 --disk-size 20 --num-nodes 1 
 # gcloud container clusters get-credentials dht-cluster --zone europe-west1-b --project dht-temperature-238413
