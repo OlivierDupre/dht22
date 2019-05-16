@@ -1,0 +1,33 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "podSelector": {
+                "app": "dht-pi",
+                "tier": "data"
+            },
+            "type": "cloudcode",
+            "language": "Node",
+            "request": "attach",
+            "debugPort": 9229,
+            "localRoot": "${workspaceFolder}/pi",
+            "remoteRoot": "/pi",
+            "name": "Debug Frontend on Kubernetes",
+
+        },
+        {
+            "podSelector": {
+                "app": "dht-backend",
+                "tier": "backend"
+            },
+            "type": "cloudcode",
+            "language": "Node",
+            "request": "attach",
+            "debugPort": 9229,
+            "localRoot": "${workspaceFolder}/backend",
+            "remoteRoot": "/backend",
+            "name": "Debug Backend on Kubernetes",
+
+        }
+    ]
+}
